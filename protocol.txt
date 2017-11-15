@@ -1,0 +1,71 @@
+# Comunicação do depósito com o nó intermediário (via UDP)
+
+- Depósito pede ao nó o endereço de um dos servidores
+
+{
+	'source': 'warehouse',
+	'action': 'get_server'
+}
+
+- Nó retorna o endereço de algum servidor
+
+{
+	'source': 'node',
+	'payload': {
+		'best_server': (addr, port)
+	}
+}
+
+# Comunicação do depósito com o servidor (via TCP)
+
+- Se for o primeiro acesso, precisa autenticar
+
+{
+	'source': 'warehouse',
+	'action': 'auth',
+	'payload': {
+		'location': '...',
+		'user': '...',
+		'pass': '...'
+	}
+}
+
+- Recebe uma confirmação se estiver ok
+
+{
+	'source': 'server',
+	'payload': {
+		'status': 200,
+	}
+}
+
+- Se não estiver ok (já estiver registrado)
+
+{
+	'source': 'server',
+	'payload': {
+		'status': 400,
+		'message': 'already signed in, please log in'
+	}
+}
+
+- Realiza o log in
+
+{
+	'source': 'warehouse',
+	'action': 'login',
+	'payload': {
+		'user': '...',
+		'pass': '...'
+	}
+}
+
+- Recebe a confirmação ou não semelhante ao que rolou anteriormente
+
+- Se logou, envia os novos itens do estoque
+
+{
+	'action': 'new_entry',
+	'payload': [...]
+}
+

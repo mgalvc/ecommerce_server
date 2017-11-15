@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Warehouse</title>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="{{ url_for('static', filename='app.js') }}"></script>
+</head>
+<body>
+	<div id="app">
+		<form>
+			Product: <br>
+			<input v-model='item.product'><br>
+			Quantity: <br>
+			<input v-model='item.quantity'><br>
+			<button type="reset" v-on:click='addToList'>Add to List</button>
+			<button type="button" v-on:click=sendItens>Send all</button>
+		</form>
+
+		<ul>
+			<li v-for='obj in itens'> 
+				<p>Product: [[ obj.product ]]</p>
+				<p>Quantity: [[ obj.quantity ]]</p>
+			</li>
+		</ul>
+	</div>
+
+	<script type="text/javascript">
+		var app = new Vue({
+			el: '#app',
+			delimiters: ['[[', ']]'],
+			data: {
+				item: {},
+				itens: []
+			},
+			methods: {
+				addToList: function() {
+					if (this.item.product && this.item.quantity) {
+						this.itens.push({
+							product: this.item.product,
+							quantity: this.item.quantity
+						})
+
+						this.item.product = ''
+						this.item.quantity = ''
+						
+						console.log(this.itens)
+					}
+				},
+				sendItens: function() {
+					if(this.itens.length > 0) {
+						axios.post('/send_itens', {itens: this.itens})
+							.then(function(response) {
+								console.log(response)
+							})
+						this.itens = []
+					}
+				}
+			}
+		})
+	</script>
+</body>
+</html>
