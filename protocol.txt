@@ -1,71 +1,20 @@
-# Comunicação do depósito com o nó intermediário (via UDP)
+Porta do servidor: 8000
+Porta do nó: 8001
+Porta do depósito: 8002
+Porta do consumidor: 8003
 
-- Depósito pede ao nó o endereço de um dos servidores
 
-{
-	'source': 'warehouse',
-	'action': 'get_server'
-}
+# Comunicação do cliente com o nó (distribuidor)
 
-- Nó retorna o endereço de algum servidor
-
-{
-	'source': 'node',
-	'payload': {
-		'best_server': (addr, port)
-	}
-}
-
-# Comunicação do depósito com o servidor (via TCP)
-
-- Se for o primeiro acesso, precisa autenticar
+- Cliente pede um servidor
 
 {
-	'source': 'warehouse',
-	'action': 'auth',
-	'payload': {
-		'location': '...',
-		'user': '...',
-		'pass': '...'
-	}
+	'source': 'customer',
+	'action': 'get_best_server'
 }
 
-- Recebe uma confirmação se estiver ok
+- Nó retorna um endereço
 
 {
-	'source': 'server',
-	'payload': {
-		'status': 200,
-	}
+	'best_server': (address, port)
 }
-
-- Se não estiver ok (já estiver registrado)
-
-{
-	'source': 'server',
-	'payload': {
-		'status': 400,
-		'message': 'already signed in, please log in'
-	}
-}
-
-- Realiza o log in
-
-{
-	'source': 'warehouse',
-	'action': 'login',
-	'payload': {
-		'user': '...',
-		'pass': '...'
-	}
-}
-
-- Recebe a confirmação ou não semelhante ao que rolou anteriormente
-
-- Se logou, envia os novos itens do estoque
-
-{
-	'action': 'new_entry',
-	'payload': [...]
-}
-

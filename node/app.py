@@ -3,7 +3,7 @@ from utils import ConnectionHandler
 import netifaces as ni
 
 my_address = ni.ifaddresses('wlp2s0')[ni.AF_INET][0]['addr']
-my_port = 8000
+my_port = 8001
 
 class UDPServer(socketserver.ThreadingMixIn, socketserver.UDPServer): pass
 

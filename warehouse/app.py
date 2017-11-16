@@ -7,7 +7,7 @@ warehouse = client.Client()
 
 @app.route('/')
 def index():
-	return render_template('/page.html', title=warehouse.update_servers())
+	return render_template('/page.html')
 
 @app.route('/send_itens', methods=['POST'])
 def send_itens():

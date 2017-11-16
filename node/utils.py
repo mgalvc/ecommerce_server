@@ -1,5 +1,15 @@
 import json, socketserver
 
+servers = [
+	('server1', 8000),
+	('server2', 8000),
+	('server3', 8000)
+]
+
+def get_server_round_robin():
+	best = servers.pop(0)
+	servers.append(best)
+	return best
 
 class ConnectionHandler(socketserver.BaseRequestHandler):
 
@@ -7,15 +17,15 @@ class ConnectionHandler(socketserver.BaseRequestHandler):
 		data = json.loads(self.request[0].decode())
 		socket = self.request[1]
 
-		if data.get('source') == 'warehouse':
-			if data.get('action') == 'get_server':
+		if data.get('source') == 'customer':
+			if data.get('action') == 'get_best_server':
 				response = {
-					'source': 'node',
-					'payload': {
-						'best_server': ('addr', 'port')
-					}
+					'best_server': get_server_round_robin()
 				}
 
+				
+
 				socket.sendto(json.dumps(response).encode(), self.client_address)
+
 
 

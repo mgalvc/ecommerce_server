@@ -27,6 +27,6 @@ class Client(object):
 
 		self.socket_to_multicast.sendto(json.dumps(message).encode(), ('225.0.0.250', 10000))
 
-		return 'will send {} to servers through multicast'.format(message.get('payload'))
+		return 'sent {} to servers through multicast'.format(message.get('payload'))
 
 
