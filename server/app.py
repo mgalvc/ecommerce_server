@@ -3,6 +3,8 @@ from twisted.internet import reactor
 import sys
 import threading
 import json
+import socketserver
+
 
 my_address = sys.argv[1]
 my_port = 8000
@@ -23,8 +25,6 @@ class MulticastingServer(DatagramProtocol):
 			if response.get('action') == 'new_entry':
 				itens = response.get('payload').get('itens')
 				location = response.get('payload').get('location')
-
-				print(itens)
 
 				for item in itens:
 					if item in stock:
@@ -47,6 +47,18 @@ class MulticastingServer(DatagramProtocol):
 
 				self.transport.write('ok'.encode(), address)
 
+
+class TCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer): pass
+
+class TCPHandler(socketserver.BaseRequestHandler):
+
+	def handle(self):
+		print("{} connected".format(self.client_address[0]))
+
+tcp_server = TCPServer((my_address, my_port), TCPHandler)
+tcp_thread = threading.Thread(target=tcp_server.serve_forever)
+tcp_thread.daemon = True
+tcp_thread.start()
 
 reactor.listenMulticast(10000, MulticastingServer(), listenMultiple=True)
 reactor.run()
