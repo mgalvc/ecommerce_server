@@ -2,9 +2,12 @@ from twisted.internet.protocol import DatagramProtocol
 from twisted.internet import reactor
 import sys
 import threading
+import json
 
 my_address = sys.argv[1]
 my_port = 8000
+
+stock = {}
 
 class MulticastingServer(DatagramProtocol):
 
@@ -13,8 +16,27 @@ class MulticastingServer(DatagramProtocol):
 		self.transport.joinGroup('225.0.0.250')
 
 	def datagramReceived(self, datagram, address):
-		print('received {} from {}'.format(datagram, address))
-		self.transport.write('ok'.encode(), address)
+
+		response = json.loads(datagram.decode())
+
+		if response.get('source') == 'warehouse':
+			if response.get('action') == 'new_entry':
+				itens = response.get('payload').get('itens')
+				location = response.get('payload').get('location')
+
+				print(itens)
+
+				for item in itens:
+					to_update = {
+						item: {
+							location: itens[item]
+						}
+					}
+					stock.update(to_update)
+
+				print(stock)
+
+				self.transport.write('ok'.encode(), address)
 
 
 reactor.listenMulticast(10000, MulticastingServer(), listenMultiple=True)

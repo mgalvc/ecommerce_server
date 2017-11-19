@@ -21,7 +21,7 @@ class Client(object):
 			'action': 'new_entry',
 			'payload': {
 				'itens': itens,
-				'location': 'Feira de Santana'
+				'location': 'Salvador'
 			}
 		}
 
