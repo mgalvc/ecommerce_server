@@ -1,9 +1,9 @@
 import json, socketserver
 
 servers = [
-	('server1', 8000),
-	('server2', 8000),
-	('server3', 8000)
+	('localhost', 8000),
+	('localhost', 8000),
+	('localhost', 8000)
 ]
 
 def get_server_round_robin():

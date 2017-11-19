@@ -15,7 +15,7 @@ def send_itens():
 	itens_map = {}
 	for item in itens.get('itens'):
 		itens_map.update({
-			item.get('product'): item.get('quantity')
+			item.get('product'): int(item.get('quantity'))
 		})
 	print(itens_map)
 	warehouse.update_servers(itens_map)

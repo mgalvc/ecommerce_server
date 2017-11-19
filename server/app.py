@@ -27,12 +27,21 @@ class MulticastingServer(DatagramProtocol):
 				print(itens)
 
 				for item in itens:
-					to_update = {
-						item: {
-							location: itens[item]
+					if item in stock:
+						if location in stock[item]:
+							stock[item][location] += itens[item]
+						else:
+							to_update = {
+								location: itens[item]
+							}
+							stock[item].update(to_update)
+					else:						
+						to_update = {
+							item: {
+								location: itens[item]
+							}
 						}
-					}
-					stock.update(to_update)
+						stock.update(to_update)
 
 				print(stock)
 
