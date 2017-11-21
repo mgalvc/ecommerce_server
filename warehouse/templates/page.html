@@ -4,25 +4,31 @@
 	<title>Warehouse</title>
 	<script src="https://unpkg.com/vue/dist/vue.js"></script>
 	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-	<script src="{{ url_for('static', filename='app.js') }}"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-	<div id="app">
-		<form>
-			Product: <br>
-			<input v-model='item.product'><br>
-			Quantity: <br>
-			<input v-model='item.quantity'><br>
-			<button type="reset" v-on:click='addToList'>Add to List</button>
-			<button type="button" v-on:click=sendItens>Send all</button>
-		</form>
+	<div id="app" class="container">
+		<div class="row">
+			<form class="col s12">
+				<div class="input-field col s4">
+					<input placeholder="Product" v-model='item.product' type="text" id="product">	
+				</div>
+				<div class="input-field col s4">
+					<input placeholder="Quantity" v-model='item.quantity' type="number" id="quantity">
+				</div>
+				<div class="input-field col s4">
+					<button class="waves-effect waves-light btn" type="reset" v-on:click='addToList'><i class="material-icons right">add</i>Add to List</button>
+				</div>				
+			</form>
+		</div>
 
-		<ul>
-			<li v-for='obj in itens'> 
-				<p>Product: [[ obj.product ]]</p>
-				<p>Quantity: [[ obj.quantity ]]</p>
-			</li>
+		<ul class="collection with-header">
+			<li class="collection-header"><h4>Itens</h4></li>
+			<li class="collection-item" v-for="obj in itens"><div>[[obj.product]]<div class="secondary-content">[[obj.quantity]]</div></div></li>
 		</ul>
+
+		<button v-on:click='sendItens' class="btn">Submit <i class="material-icons right">send</i></button>
 	</div>
 
 	<script type="text/javascript">

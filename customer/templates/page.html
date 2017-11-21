@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Customer</title>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+	<div class="container">
+		<nav>
+			<div class="nav-wrapper">
+				<a href="" class="brand-logo center">Magazine Ana Luiza</a>
+				<ul id="nav-mobile" class="right hide-on-med-and-down">
+					<li><a href="">My Cart</a></li>
+					<li><a href="">Login</a></li>
+				</ul>
+			</div>
+		</nav>
+		<div class="collection">
+			{% for product in products %}
+				<a href="" class="collection-item"><span class="badge">{{products[product]}}</span>{{product}}</a>
+			{% endfor %}
+		</div>
+	</div>
+</body>
+</html>

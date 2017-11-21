@@ -24,4 +24,4 @@ def send_itens():
 
 if __name__ == '__main__':
 	# warehouse.config(sys.argv[1], int(sys.argv[2]))
-	app.run(debug=True)
+	app.run(debug=True, port=5001)

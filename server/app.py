@@ -9,7 +9,8 @@ import socketserver
 my_address = sys.argv[1]
 my_port = 8000
 
-stock = {}
+stock_details = {}
+stock_total = {}
 
 class MulticastingServer(DatagramProtocol):
 
@@ -27,23 +28,29 @@ class MulticastingServer(DatagramProtocol):
 				location = response.get('payload').get('location')
 
 				for item in itens:
-					if item in stock:
-						if location in stock[item]:
-							stock[item][location] += itens[item]
+					if item in stock_details:
+						if location in stock_details[item]:
+							stock_details[item][location] += itens[item]
 						else:
 							to_update = {
 								location: itens[item]
 							}
-							stock[item].update(to_update)
+							stock_details[item].update(to_update)
 					else:						
 						to_update = {
 							item: {
 								location: itens[item]
 							}
 						}
-						stock.update(to_update)
+						stock_details.update(to_update)
 
-				print(stock)
+					if item in stock_total:
+						stock_total[item] += itens[item]
+					else: 
+						stock_total.update({ item: itens[item] })
+
+				print(stock_details)
+				print(stock_total)
 
 				self.transport.write('ok'.encode(), address)
 
@@ -54,6 +61,16 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
 	def handle(self):
 		print("{} connected".format(self.client_address[0]))
+
+		while True:
+			request = json.loads(self.request.recv(1024).decode())
+			
+			response = {
+				'source': 'server',
+				'payload': stock_total
+			}
+
+			self.request.send(json.dumps(response).encode())
 
 tcp_server = TCPServer((my_address, my_port), TCPHandler)
 tcp_thread = threading.Thread(target=tcp_server.serve_forever)

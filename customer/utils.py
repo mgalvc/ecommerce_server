@@ -6,3 +6,8 @@ class CustomerService(object):
 
 	def start(self):
 		self.socket.connect(self.best_server)
+
+	def send_message(self, message):
+		self.socket.send(message)
+
+		return self.socket.recv(1024)

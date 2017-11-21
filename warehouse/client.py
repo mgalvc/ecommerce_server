@@ -21,7 +21,7 @@ class Client(object):
 			'action': 'new_entry',
 			'payload': {
 				'itens': itens,
-				'location': 'Salvador'
+				'location': 'FSA'
 			}
 		}
 

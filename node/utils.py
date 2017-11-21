@@ -23,8 +23,6 @@ class ConnectionHandler(socketserver.BaseRequestHandler):
 					'best_server': get_server_round_robin()
 				}
 
-				
-
 				socket.sendto(json.dumps(response).encode(), self.client_address)
 
 
