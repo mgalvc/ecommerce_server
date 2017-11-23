@@ -30,7 +30,9 @@ class MulticastingServer(DatagramProtocol):
 				for item in itens:
 					if item in stock_details:
 						if location in stock_details[item]:
-							stock_details[item][location] += itens[item]
+							stock_details[item][location]['quantity'] += itens[item]['quantity']
+							stock_details[item][location]['price'] = itens[item]['price']
+							stock_details[item][location]['tax'] = itens[item]['tax']
 						else:
 							to_update = {
 								location: itens[item]
@@ -45,9 +47,14 @@ class MulticastingServer(DatagramProtocol):
 						stock_details.update(to_update)
 
 					if item in stock_total:
-						stock_total[item] += itens[item]
+						stock_total[item]['quantity'] += itens[item]['quantity']
+						stock_total[item]['price'] = itens[item]['price']
 					else: 
-						stock_total.update({ item: itens[item] })
+						stock_total.update({ item: {
+								'quantity': itens[item]['quantity'],
+								'price': itens[item]['price']
+							}
+						})
 
 				print(stock_details)
 				print(stock_total)

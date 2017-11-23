@@ -19,7 +19,11 @@
 		</nav>
 		<div class="collection">
 			{% for product in products %}
-				<a href="" class="collection-item"><span class="badge">{{products[product]}}</span>{{product}}</a>
+				<a href="" class="collection-item">
+					<span class="badge">{{ products.get(product).get('quantity') }} in stock</span>
+					<span class="badge">R$ {{products.get(product).get('price')}}</span>
+					{{product}}
+				</a>
 			{% endfor %}
 		</div>
 	</div>
