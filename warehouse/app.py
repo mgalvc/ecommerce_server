@@ -4,6 +4,7 @@ import sys
 
 app = Flask(__name__)
 warehouse = client.Client()
+location = sys.argv[1]
 
 @app.route('/')
 def index():
@@ -22,7 +23,7 @@ def send_itens():
 			}
 		})
 	print(itens_map)
-	warehouse.update_servers(itens_map)
+	warehouse.update_servers(itens_map, location)
 
 	return 'got your message'
 

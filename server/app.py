@@ -4,6 +4,10 @@ import sys
 import threading
 import json
 import socketserver
+import os
+import time
+from geopy.geocoders import Nominatim
+from geopy.distance import vincenty
 
 
 my_address = sys.argv[1]
@@ -11,6 +15,51 @@ my_port = 8000
 
 stock_details = {}
 stock_total = {}
+
+path = os.path.dirname(os.path.abspath(__file__))
+
+if os.path.exists(path + '/stock_details.txt'):
+	stock_details_file = open(path + '/stock_details.txt', 'r')
+	stock_total_file = open(path + '/stock_total.txt', 'r')
+
+	stock_details = json.loads(stock_details_file.read())
+	stock_total = json.loads(stock_total_file.read())
+
+	stock_details_file.close()
+	stock_total_file.close()
+
+	print(stock_details)
+	print(stock_total)
+
+def flush_stock():
+	stock_details_file = open(path + '/stock_details.txt', 'w')
+	stock_total_file = open(path + '/stock_total.txt', 'w')
+
+	stock_details_file.write(json.dumps(stock_details))
+	stock_total_file.write(json.dumps(stock_total))
+
+	stock_details_file.close()
+	stock_total_file.close()
+
+def get_closest(location, warehouses):
+	closest = None
+	geolocator = Nominatim()
+
+	for warehouse in warehouses:
+		origin_geocode = geolocator.geocode(location)
+		origin = (origin_geocode.latitude, origin_geocode.longitude)
+		destination_geocode = geolocator.geocode(warehouse)
+		destination = (destination_geocode.latitude, destination_geocode.longitude)
+
+		distance = vincenty(origin, destination).miles
+
+		if closest == None or closest[1] > distance:
+			closest = [warehouse, distance]
+
+	closest[1] = closest[1] * 1.609344
+
+	return closest
+
 
 class MulticastingServer(DatagramProtocol):
 
@@ -56,6 +105,8 @@ class MulticastingServer(DatagramProtocol):
 							}
 						})
 
+				flush_stock()
+
 				print(stock_details)
 				print(stock_total)
 
@@ -71,13 +122,34 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
 		while True:
 			request = json.loads(self.request.recv(1024).decode())
-			
-			response = {
-				'source': 'server',
-				'payload': stock_total
-			}
 
-			self.request.send(json.dumps(response).encode())
+			if request.get('source') == 'customer':
+				if request.get('action') == 'get_products':
+					response = {
+						'source': 'server',
+						'payload': stock_total
+					}
+					
+					self.request.send(json.dumps(response).encode())
+				if request.get('action') == 'get_shipping_tax':
+					itens = request.get('payload').get('itens')
+					location = request.get('payload').get('location')
+
+					for item in itens:
+						warehouses = list(stock_details[item])
+						closest_warehouse = get_closest(location, warehouses)
+
+					tax = round(closest_warehouse[1] * 2, 2)
+
+					response = {
+						'source': 'server',
+						'payload': {
+							'tax': tax,
+							'warehouse_location': closest_warehouse[0]
+						}
+					}
+
+					self.request.send(json.dumps(response).encode())
 
 tcp_server = TCPServer((my_address, my_port), TCPHandler)
 tcp_thread = threading.Thread(target=tcp_server.serve_forever)

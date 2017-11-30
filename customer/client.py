@@ -35,11 +35,25 @@ class Client(object):
 			'action': 'get_products'
 		}
 
-		response = self.service.send_message(json.dumps(request).encode())
+		response = self.send_message(request)
 
 		products = json.loads(response.decode()).get('payload')
 
 		return products
 
+	def get_shipping_tax(self, itens, location):
+		request = {
+			'source': 'customer',
+			'action': 'get_shipping_tax',
+			'payload': {
+				'itens': itens,
+				'location': location
+			}
+		}
+
+		response = json.loads(self.send_message(request).decode())
+
+		return response.get('payload')
+
 	def send_message(self, message):
-		self.service.send_message(json.dumps(message).encode())
+		return self.service.send_message(json.dumps(message).encode())

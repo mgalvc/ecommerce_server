@@ -15,13 +15,13 @@ class Client(object):
 		self.node_address = node_address
 		self.node_port = node_port
 
-	def update_servers(self, itens):
+	def update_servers(self, itens, location):
 		message = {
 			'source': 'warehouse',
 			'action': 'new_entry',
 			'payload': {
 				'itens': itens,
-				'location': 'FSA'
+				'location': location
 			}
 		}
 
