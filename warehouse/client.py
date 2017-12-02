@@ -8,13 +8,6 @@ class Client(object):
 		self.socket_to_multicast = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		ttl_bin = struct.pack('@i', 1)
 		self.socket_to_multicast.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl_bin)
-		
-		self.node_address = None
-		self.node_port = None
-
-	def config(self, node_address, node_port):
-		self.node_address = node_address
-		self.node_port = node_port
 
 	def update_servers(self, itens, location):
 		message = {

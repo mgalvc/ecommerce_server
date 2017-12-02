@@ -5,6 +5,7 @@ import threading
 import json
 import socketserver
 import os
+import socket
 import time
 from geopy.geocoders import Nominatim
 from geopy.distance import vincenty
@@ -60,6 +61,18 @@ def get_closest(location, warehouses):
 
 	return closest
 
+socket_to_multicast = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+ttl_bin = struct.pack('@i', 1)
+socket_to_multicast.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl_bin)
+
+def update_others(message):
+	request = {
+		'source': my_address,
+		'action': 'update',
+		'payload': message
+	}
+	socket_to_multicast.sendto(json.dumps(request).encode(), ('225.0.0.250', 10000))
+
 
 class MulticastingServer(DatagramProtocol):
 
@@ -110,6 +123,16 @@ class MulticastingServer(DatagramProtocol):
 				print(stock_total)
 
 				self.transport.write('ok'.encode(), address)
+		elif not response.get('source') == my_address:
+			if response.get('action') == 'update':
+				itens = request.get('payload').get('itens')
+				warehouse_location = request.get('payload').get('warehouse_location')
+				
+				for item in itens:
+					stock_total[item]['quantity'] -= itens[item]
+				
+				flush_stock()
+
 
 
 class TCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer): pass
@@ -171,8 +194,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
 						for item in itens:
 							stock_total[item]['quantity'] -= itens[item]
 						payload_message = "itens are reserved"
-
-					flush_stock()
+						flush_stock()
+						update_others(request.get('payload'))
 
 					response = {
 						'source': 'server',
