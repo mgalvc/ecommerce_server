@@ -5,12 +5,13 @@ import utils
 import threading
 
 
+
 class Client(object):
 
-	def __init__(self):
+	def __init__(self, node_addr):
 		self.socket_to_node = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.socket_to_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.node_addr = ('', 8001)
+		self.node_addr = node_addr
 
 	def connect_to_best_server(self):
 		request = {
@@ -54,6 +55,17 @@ class Client(object):
 		response = json.loads(self.send_message(request).decode())
 
 		return response.get('payload')
+
+	def proceed_checkout(self, message):
+		request = {
+			'source': 'customer',
+			'action': 'checkout',
+			'payload': message
+		}
+
+		response = json.loads(self.send_message(request).decode())
+
+		return response.get('payload')		
 
 	def send_message(self, message):
 		return self.service.send_message(json.dumps(message).encode())

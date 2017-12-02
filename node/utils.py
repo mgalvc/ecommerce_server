@@ -1,8 +1,8 @@
 import json, socketserver
 
 servers = [
-	('localhost', 8000),
-	('localhost', 8000),
+	('localhost', 8000), 
+	('localhost', 8000), 
 	('localhost', 8000)
 ]
 

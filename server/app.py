@@ -11,7 +11,7 @@ from geopy.distance import vincenty
 
 
 my_address = sys.argv[1]
-my_port = 8000
+my_port = int(sys.argv[2])
 
 stock_details = {}
 stock_total = {}
@@ -79,7 +79,6 @@ class MulticastingServer(DatagramProtocol):
 				for item in itens:
 					if item in stock_details:
 						if location in stock_details[item]:
-							stock_details[item][location]['quantity'] += itens[item]['quantity']
 							stock_details[item][location]['price'] = itens[item]['price']
 							stock_details[item][location]['tax'] = itens[item]['tax']
 						else:
@@ -135,17 +134,50 @@ class TCPHandler(socketserver.BaseRequestHandler):
 					itens = request.get('payload').get('itens')
 					location = request.get('payload').get('location')
 
+					tax = 0
+
 					for item in itens:
 						warehouses = list(stock_details[item])
 						closest_warehouse = get_closest(location, warehouses)
+						tax += stock_details[item][closest_warehouse[0]]['tax'] * 2.5 * itens[item]
 
-					tax = round(closest_warehouse[1] * 2, 2)
+					tax = round(tax, 2)
 
 					response = {
 						'source': 'server',
 						'payload': {
 							'tax': tax,
 							'warehouse_location': closest_warehouse[0]
+						}
+					}
+
+					self.request.send(json.dumps(response).encode())
+				if request.get('action') == 'checkout':
+					itens = request.get('payload').get('itens')
+					warehouse_location = request.get('payload').get('warehouse_location')
+
+					print("get {} from {}".format(itens, warehouse_location))
+
+					payload_message = None
+					status_ok = True
+
+					for item in itens:
+						if itens[item] > stock_total[item]['quantity']:
+							payload_message = "not enough {} in stock".format(item)
+							status_ok = False
+							break
+
+					if status_ok:
+						for item in itens:
+							stock_total[item]['quantity'] -= itens[item]
+						payload_message = "itens are reserved"
+
+					flush_stock()
+
+					response = {
+						'source': 'server',
+						'payload': {
+							'message': payload_message
 						}
 					}
 

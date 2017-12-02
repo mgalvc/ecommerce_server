@@ -4,8 +4,9 @@ import sys
 import json
 
 app = Flask(__name__)
-customer = client.Client()
 location = sys.argv[1]
+node_addr = (sys.argv[2], int(sys.argv[3]))
+customer = client.Client(node_addr)
 
 @app.route('/')
 def index():
@@ -16,6 +17,12 @@ def index():
 def getShippingTax():
 	itens = request.get_json()
 	response = customer.get_shipping_tax(itens, location)
+	return json.dumps(response)
+
+@app.route('/proceed_checkout', methods=['POST'])
+def proceedCheckout():
+	msg = request.get_json()
+	response = customer.proceed_checkout(msg)
 	return json.dumps(response)
 
 if __name__ == '__main__':

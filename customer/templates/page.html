@@ -23,7 +23,7 @@
 		<!-- itens -->
 		<div class="collection" v-if="!show_cart">
 			{% for product in products %}
-				<a class="collection-item">
+				<a class="collection-item disabled">
 					<span class="badge" v-on:click="addToCart('{{product}}', {{products.get(product).get('price')}})"><i class="material-icons">add_shopping_cart</i></span>
 					<span class="badge">{{ products.get(product).get('quantity') }} in stock</span>
 					<span class="badge">R$ {{ products.get(product).get('price') }}</span>
@@ -56,7 +56,7 @@
 				<h5 class="white-text">Total: R$ [[ getItensTotal() + shipping.tax ]]</h5>
 
 				<button class="btn" v-on:click="calcShippingTax">Calculate Shipping Tax</button>
-				<button class="btn">Proceed to checkout</button>
+				<button v-bind:class="{ disabled: shipping.tax == 0 }" class="btn" v-on:click="proceedCheckout">Proceed to checkout</button>
 			</div>
 		</div>
 	</div>
@@ -109,6 +109,14 @@
 								shipping.tax = response.data.tax
 								shipping.warehouse_location = response.data.warehouse_location
 							})
+					}
+				},
+				proceedCheckout: function() {
+					if (this.cart_length && this.shipping.tax > 0) {
+						axios.post('/proceed_checkout', {itens: this.cart, warehouse_location: this.shipping.warehouse_location}).then(function(response) {
+							console.log(response)
+							//window.location.reload()
+						})
 					}
 				},
 				showCart: function() {
