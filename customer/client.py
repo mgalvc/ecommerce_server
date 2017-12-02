@@ -2,8 +2,6 @@ import socket
 import json
 import sys
 import utils
-import threading
-
 
 
 class Client(object):

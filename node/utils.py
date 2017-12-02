@@ -1,9 +1,8 @@
 import json, socketserver
 
 servers = [
-	('localhost', 8000), 
-	('localhost', 8000), 
-	('localhost', 8000)
+	('192.168.15.4', 8000), 
+	('192.168.15.13', 8000), 
 ]
 
 def get_server_round_robin():
@@ -18,6 +17,7 @@ class ConnectionHandler(socketserver.BaseRequestHandler):
 		socket = self.request[1]
 
 		if data.get('source') == 'customer':
+			print('someone connected')
 			if data.get('action') == 'get_best_server':
 				response = {
 					'best_server': get_server_round_robin()

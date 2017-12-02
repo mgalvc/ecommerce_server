@@ -126,8 +126,8 @@ class MulticastingServer(DatagramProtocol):
 				self.transport.write('ok'.encode(), address)
 		elif not response.get('source') == my_address:
 			if response.get('action') == 'update':
-				itens = request.get('payload').get('itens')
-				warehouse_location = request.get('payload').get('warehouse_location')
+				itens = response.get('payload').get('itens')
+				warehouse_location = response.get('payload').get('warehouse_location')
 				
 				for item in itens:
 					stock_total[item]['quantity'] -= itens[item]
@@ -206,6 +206,13 @@ class TCPHandler(socketserver.BaseRequestHandler):
 					}
 
 					self.request.send(json.dumps(response).encode())
+
+first_request = {
+	'source': my_address,
+	'action': 'new_server'
+}
+
+socket_to_multicast.sendto(json.dumps(first_request).encode(), ('225.0.0.250', 10000))
 
 tcp_server = TCPServer((my_address, my_port), TCPHandler)
 tcp_thread = threading.Thread(target=tcp_server.serve_forever)

@@ -7,6 +7,7 @@ app = Flask(__name__)
 location = sys.argv[1]
 node_addr = (sys.argv[2], int(sys.argv[3]))
 customer = client.Client(node_addr)
+customer.connect_to_best_server()
 
 @app.route('/')
 def index():
@@ -26,5 +27,4 @@ def proceedCheckout():
 	return json.dumps(response)
 
 if __name__ == '__main__':
-	customer.connect_to_best_server()
-	app.run(debug=True)
+	app.run()
