@@ -6,7 +6,6 @@ click==6.7
 constantly==15.1.0
 Flask==0.12.2
 geopy==1.11.0
-googlemaps==2.5.1
 hyperlink==17.3.1
 idna==2.6
 incremental==17.5.0
