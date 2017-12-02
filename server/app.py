@@ -6,6 +6,7 @@ import json
 import socketserver
 import os
 import socket
+import struct
 import time
 from geopy.geocoders import Nominatim
 from geopy.distance import vincenty
