@@ -93,7 +93,7 @@ class MulticastingServer(DatagramProtocol):
 	def datagramReceived(self, datagram, address):
 
 		response = json.loads(datagram.decode())
-		print("got message from {}".format(address))
+		print("got {} from {}".format(response, address))
 
 		if response.get('source') == 'warehouse':
 			if response.get('action') == 'new_entry':
