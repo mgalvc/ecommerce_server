@@ -114,8 +114,9 @@
 				proceedCheckout: function() {
 					if (this.cart_length && this.shipping.tax > 0) {
 						axios.post('/proceed_checkout', {itens: this.cart, warehouse_location: this.shipping.warehouse_location}).then(function(response) {
-							console.log(response)
-							//window.location.reload()
+							//console.log(response.data)
+							alert(response.data.message)
+							window.location.reload()
 						})
 					}
 				},

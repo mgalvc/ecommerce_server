@@ -216,14 +216,14 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
 					for item in itens:
 						if itens[item] > stock_total[item]['quantity']:
-							payload_message = "not enough {} in stock".format(item)
+							payload_message = "We have only {} units of {} in our warehouses".format(stock_total[item]['quantity'], item)
 							status_ok = False
 							break
 
 					if status_ok:
 						for item in itens:
 							stock_total[item]['quantity'] -= itens[item]
-						payload_message = "itens are reserved"
+						payload_message = "Your itens were reserved"
 						flush_stock()
 						update_others(request.get('payload'))
 
