@@ -162,6 +162,7 @@ class MulticastingServer(DatagramProtocol):
 				print("{} answered me".format(address))
 				stock_total.update(response.get('stock_total'))
 				stock_details.update(response.get('stock_details'))
+				flush_stock()
 
 
 class TCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer): pass
@@ -172,7 +173,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
 		print("{} connected".format(self.client_address[0]))
 
 		while True:
-			request = json.loads(self.request.recv(1024).decode())
+			request = json.loads(self.request.recv(2048).decode())
 
 			if request.get('source') == 'customer':
 				if request.get('action') == 'get_products':
