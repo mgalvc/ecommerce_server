@@ -24,13 +24,6 @@ socket_to_multicast.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl_b
 stock_details = {}
 stock_total = {}
 
-first_request = {
-	'source': my_address,
-	'action': 'new_server'
-}
-
-socket_to_multicast.sendto(json.dumps(first_request).encode(), ('225.0.0.250', 10000))
-
 path = os.path.dirname(os.path.abspath(__file__))
 
 if os.path.exists(path + '/stock_details.txt'):
@@ -89,6 +82,13 @@ class MulticastingServer(DatagramProtocol):
 	def startProtocol(self):
 		self.transport.setTTL(1)
 		self.transport.joinGroup('225.0.0.250')
+
+		first_request = {
+			'source': my_address,
+			'action': 'new_server'
+		}
+
+		socket_to_multicast.sendto(json.dumps(first_request).encode(), ('225.0.0.250', 10000))
 
 	def datagramReceived(self, datagram, address):
 
