@@ -15,8 +15,21 @@ from geopy.distance import vincenty
 my_address = sys.argv[1]
 my_port = int(sys.argv[2])
 
+updated = False
+
+socket_to_multicast = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+ttl_bin = struct.pack('@i', 1)
+socket_to_multicast.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl_bin)
+
 stock_details = {}
 stock_total = {}
+
+first_request = {
+	'source': my_address,
+	'action': 'new_server'
+}
+
+socket_to_multicast.sendto(json.dumps(first_request).encode(), ('225.0.0.250', 10000))
 
 path = os.path.dirname(os.path.abspath(__file__))
 
@@ -62,10 +75,6 @@ def get_closest(location, warehouses):
 
 	return closest
 
-socket_to_multicast = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-ttl_bin = struct.pack('@i', 1)
-socket_to_multicast.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl_bin)
-
 def update_others(message):
 	request = {
 		'source': my_address,
@@ -84,6 +93,7 @@ class MulticastingServer(DatagramProtocol):
 	def datagramReceived(self, datagram, address):
 
 		response = json.loads(datagram.decode())
+		print("got message from {}".format(address))
 
 		if response.get('source') == 'warehouse':
 			if response.get('action') == 'new_entry':
@@ -125,6 +135,7 @@ class MulticastingServer(DatagramProtocol):
 
 				self.transport.write('ok'.encode(), address)
 		elif not response.get('source') == my_address:
+			print('got a multicast message from other server')
 			if response.get('action') == 'update':
 				itens = response.get('payload').get('itens')
 				warehouse_location = response.get('payload').get('warehouse_location')
@@ -133,7 +144,23 @@ class MulticastingServer(DatagramProtocol):
 					stock_total[item]['quantity'] -= itens[item]
 				
 				flush_stock()
+			if response.get('action') == 'new_server':
+				print('{} came to network'.format(address))
 
+				message = {
+					'source': my_address,
+					'to': address,
+					'action': 'new_server_response',
+					'stock_details': stock_details,
+					'stock_total': stock_total
+				}
+
+				socket_to_multicast.sendto(json.dumps(message).encode(), ('225.0.0.250', 10000))
+			if response.get('action') == 'new_server_response' and response.get('to') == my_address and not updated:
+				updated = True
+				print("{} answered me".format(address))
+				stock_total.update(response.get('stock_total'))
+				stock_details.update(response.get('stock_details'))
 
 
 class TCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer): pass
@@ -206,13 +233,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
 					}
 
 					self.request.send(json.dumps(response).encode())
-
-first_request = {
-	'source': my_address,
-	'action': 'new_server'
-}
-
-socket_to_multicast.sendto(json.dumps(first_request).encode(), ('225.0.0.250', 10000))
 
 tcp_server = TCPServer((my_address, my_port), TCPHandler)
 tcp_thread = threading.Thread(target=tcp_server.serve_forever)

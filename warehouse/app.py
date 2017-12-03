@@ -5,6 +5,7 @@ import sys
 app = Flask(__name__)
 warehouse = client.Client()
 location = sys.argv[1]
+my_address = sys.argv[2]
 
 @app.route('/')
 def index():
@@ -29,4 +30,4 @@ def send_itens():
 
 if __name__ == '__main__':
 	# warehouse.config(sys.argv[1], int(sys.argv[2]))
-	app.run(debug=True, host="192.168.15.4", port=5001)
+	app.run(debug=True, host=my_address, port=5001)
