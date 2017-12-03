@@ -149,7 +149,7 @@ class MulticastingServer(DatagramProtocol):
 
 				message = {
 					'source': my_address,
-					'to': address,
+					'to': address[0],
 					'action': 'new_server_response',
 					'stock_details': stock_details,
 					'stock_total': stock_total
