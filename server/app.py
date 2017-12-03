@@ -18,7 +18,7 @@ my_port = int(sys.argv[2])
 updated = False
 
 socket_to_multicast = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-ttl_bin = struct.pack('@i', 1)
+ttl_bin = struct.pack('@i', 3)
 socket_to_multicast.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl_bin)
 
 stock_details = {}
