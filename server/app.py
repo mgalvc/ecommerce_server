@@ -157,6 +157,7 @@ class MulticastingServer(DatagramProtocol):
 
 				socket_to_multicast.sendto(json.dumps(message).encode(), ('225.0.0.250', 10000))
 			if response.get('action') == 'new_server_response' and response.get('to') == my_address and not updated:
+				global updated
 				updated = True
 				print("{} answered me".format(address))
 				stock_total.update(response.get('stock_total'))
