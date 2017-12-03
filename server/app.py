@@ -230,7 +230,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
 					response = {
 						'source': 'server',
 						'payload': {
-							'message': payload_message
+							'message': payload_message,
+							'done': status_ok
 						}
 					}
 
