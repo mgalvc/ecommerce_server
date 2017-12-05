@@ -15,7 +15,7 @@ from geopy.distance import vincenty
 my_address = sys.argv[1]
 my_port = int(sys.argv[2])
 
-updated = False
+version = 0
 
 socket_to_multicast = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 ttl_bin = struct.pack('@i', 3)
@@ -128,6 +128,7 @@ class MulticastingServer(DatagramProtocol):
 							}
 						})
 
+				version += 1
 				flush_stock()
 
 				print(stock_details)
@@ -143,6 +144,7 @@ class MulticastingServer(DatagramProtocol):
 				for item in itens:
 					stock_total[item]['quantity'] -= itens[item]
 				
+				version += 1
 				flush_stock()
 			if response.get('action') == 'new_server':
 				print('{} came to network'.format(address))
@@ -151,18 +153,21 @@ class MulticastingServer(DatagramProtocol):
 					'source': my_address,
 					'to': address[0],
 					'action': 'new_server_response',
+					'version': version,
 					'stock_details': stock_details,
 					'stock_total': stock_total
 				}
 
 				socket_to_multicast.sendto(json.dumps(message).encode(), ('225.0.0.250', 10000))
-			if response.get('action') == 'new_server_response' and response.get('to') == my_address and not updated:
-				global updated
-				updated = True
-				print("{} answered me".format(address))
-				stock_total.update(response.get('stock_total'))
-				stock_details.update(response.get('stock_details'))
-				flush_stock()
+			if response.get('action') == 'new_server_response' and response.get('to') == my_address:
+				global version
+				if response.get('version') > version:
+					version = response.get('version')
+					print("{} answered me with a newer version".format(address))
+					stock_total.update(response.get('stock_total'))
+					stock_details.update(response.get('stock_details'))
+					flush_stock()
+
 
 
 class TCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer): pass
@@ -224,6 +229,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
 						for item in itens:
 							stock_total[item]['quantity'] -= itens[item]
 						payload_message = "Your itens are reserved"
+						version += 1
 						flush_stock()
 						update_others(request.get('payload'))
 
