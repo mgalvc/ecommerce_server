@@ -53,6 +53,9 @@
 				<h6 class="white-text">Itens in cart: R$ [[ getItensTotal() ]]</h6>
 				<h6 class="white-text">Shipping Tax: R$ [[ shipping.tax ]]</h6>
 				<h5 class="white-text">Total: R$ [[ getItensTotal() + shipping.tax ]]</h5>
+				<h6 class="white-text" v-show="shipping.warehouse_location != ''">
+					Your itens will be sent from [[ shipping.warehouse_location ]]
+				</h6>
 
 				<button class="btn" v-on:click="calcShippingTax">Calculate Shipping Tax</button>
 				<button v-bind:class="{ disabled: shipping.tax == 0 }" class="btn" v-on:click="proceedCheckout">Proceed to checkout</button>

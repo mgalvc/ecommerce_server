@@ -223,7 +223,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
 					if status_ok:
 						for item in itens:
 							stock_total[item]['quantity'] -= itens[item]
-						payload_message = "Your itens were reserved"
+						payload_message = "Your itens are reserved"
 						flush_stock()
 						update_others(request.get('payload'))
 
