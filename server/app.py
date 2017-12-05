@@ -91,6 +91,7 @@ class MulticastingServer(DatagramProtocol):
 		socket_to_multicast.sendto(json.dumps(first_request).encode(), ('225.0.0.250', 10000))
 
 	def datagramReceived(self, datagram, address):
+		global version
 
 		response = json.loads(datagram.decode())
 		print("got {} from {}".format(response, address))
@@ -160,7 +161,6 @@ class MulticastingServer(DatagramProtocol):
 
 				socket_to_multicast.sendto(json.dumps(message).encode(), ('225.0.0.250', 10000))
 			if response.get('action') == 'new_server_response' and response.get('to') == my_address:
-				global version
 				if response.get('version') > version:
 					version = response.get('version')
 					print("{} answered me with a newer version".format(address))
@@ -175,6 +175,7 @@ class TCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer): pass
 class TCPHandler(socketserver.BaseRequestHandler):
 
 	def handle(self):
+		global version
 		print("{} connected".format(self.client_address[0]))
 
 		while True:

@@ -8,7 +8,6 @@ class Client(object):
 
 	def __init__(self, node_addr):
 		self.socket_to_node = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		self.socket_to_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.node_addr = node_addr
 
 	def connect_to_best_server(self):
@@ -23,6 +22,8 @@ class Client(object):
 		self.best_server = tuple(response.get('best_server'))
 
 		print("best server to connect is {}".format(self.best_server))
+
+		self.socket_to_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 		self.service = utils.CustomerService(self.socket_to_server, self.best_server)
 
