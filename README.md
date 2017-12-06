@@ -30,7 +30,7 @@ To start a warehouse, you must run the following command:
         
 Where `location` means the real warehouse's address, e.g. `Salvador, Bahia`.
 
-After that you can open your browser in `http://localhost:5001/` and start playing.
+After that you can open `http://localhost:5001/` in your browser and start playing.
 
 Again, you can run more than one instance of this application.
 
