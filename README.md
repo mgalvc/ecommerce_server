@@ -1,6 +1,6 @@
-# Magazine Ana Luiza - Tutorial
+# Ecommerce Python API - Tutorial
 
-Please follow the steps below in order to run the Magazine Ana Luíza application.
+Please follow the steps below in order to run the Ecommerce Python API.
 
 ## Setting up the environment
 
